@@ -1,1 +1,3 @@
-This is a respository for Aqua.
+#AquaWidget
+------------
+###A personal assistant right by your side.
