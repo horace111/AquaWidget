@@ -13,11 +13,12 @@ class Fonts(QFont):
     font_harmony_title.setFamily("HarmonyOS Sans SC")
     font_harmony_title.setPointSize(30)
     font_harmony_title.setWeight(200)
-    
+
 class Main(QWidget):
     def __init__(self):
         super().__init__()
-        
+        self.set_mainwindow()
+        self.background_ui()
     def set_mainwindow(self):
 
         self.setWindowTitle("AquaWidget")
@@ -30,8 +31,6 @@ class Main(QWidget):
 app = QApplication(sys.argv)
 
 main_window = Main()
-main_window.set_mainwindow()
-main_window.background_ui()
 main_window.show()
 
 sys.exit(app.exec_())
