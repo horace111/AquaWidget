@@ -4,7 +4,7 @@
 ------
 ℹ️**Introduction**
 
-AquaWidget is a collection of card-style applications that play a assitant role in your daily life.
+AquaWidget is a collection of card-style applications that play an assitant role in your daily life.
 
 📲**Applications**
 
