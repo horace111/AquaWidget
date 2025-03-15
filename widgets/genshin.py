@@ -1,12 +1,22 @@
 import sys
 
-from PyQt5 import QtWidgets
+from widgets import AquaWidget
+from PyQt5.QtWidgets import *
 
-class AquaWidget():
-    def __init__(self, scale:tuple=(200, 200)):
-        self.dx , self.dy = scale
+acquire_func = None
 
-def reg(parent:QtWidgets.QWidget) -> AquaWidget:
-    widget = AquaWidget(scale=(200, 200))
-    text1 = QtWidgets.QLabel('我要玩原神！', parent=parent)
-    return widget
+def set_acquire_func(func) -> None:
+    global acquire_func
+    """
+    该函数在 widgets/__init__.py 中自动调用. 通过调用 acquire_func(), 可以从主程序获取一个 QWidget() 对象.
+    """
+    acquire_func = func
+
+def reg() -> AquaWidget:
+    global acquire_func
+    """
+    widgets 入口函数.
+    """
+    aquaw = AquaWidget(scale=(200, 200))
+    text1 = QLabel('我要玩原神！', parent=aquaw.get_aqua_widget())
+    return aquaw
