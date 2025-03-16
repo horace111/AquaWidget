@@ -1,11 +1,14 @@
 import sys
 
+import tray
 import widgets
 
 from PyQt5 import QtGui, QtCore
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import QPropertyAnimation
 from PyQt5.QtGui import QFont
+
+import widgets.music_player
 
 
 class Fonts():
@@ -52,7 +55,7 @@ DeepSeek Reasoner 的解决方案:
             6. 替代方案：系统级置顶 API
 通过调用操作系统 API 直接修改窗口属性（无需重建窗口），但需跨平台适配：
 
-# Windows 示例（需 pywin32）
+# Windows 示例(需 pywin32)
 if sys.platform == "win32":
     import win32gui
     import win32con
@@ -65,6 +68,9 @@ if sys.platform == "win32":
                 win32con.SWP_NOMOVE | win32
             """
         self.sot.stateChanged.connect(_oppo)
+    def closeEvent(self, a0) -> None:  # self.close() 以任何形式被调用时, 都只隐藏而不退出
+        self.hide()
+        a0.ignore()
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
@@ -79,6 +85,17 @@ if __name__ == '__main__':
     widgets.set_acquire_func(_acquire_qw)
     widgets.reg_all()
     widgets.auto_lay_widgets()
+
+    def _ra(): main_window.stay_on_top(); main_window.show()
+    def _qu(): app.quit()
+    mo = tray.bind_menu_option(
+        {
+            '主程序': _ra,
+            '音乐示例': lambda:widgets.music_player.music_player_plugin.quick_play('D:\\python_works\\obs\\大喜.flac'),
+            '退出': _qu
+        }
+    )
+    tray.apply(mo)
     
     main_window.show()
 
