@@ -22,7 +22,7 @@ def reg() -> AquaWidget:
     """
     widgets 入口函数.
     """
-    aquaw = AquaWidget(scale=(200, 200))
+    aquaw = AquaWidget(scale=(370, 120))
 
 
     '''

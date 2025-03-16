@@ -1,11 +1,12 @@
 import sys
+import uuid
 
 import tray
 import widgets
 
 from PyQt5 import QtGui, QtCore
 from PyQt5.QtWidgets import *
-from PyQt5.QtCore import QPropertyAnimation
+from PyQt5.QtCore import QPropertyAnimation, Qt
 from PyQt5.QtGui import QFont
 
 import widgets.music_player
@@ -29,25 +30,39 @@ class Fonts():
     font_harmony_title.setWeight(200)
 
 class Main(QWidget):
-    def __init__(self):
-        super().__init__()
-        self.set_mainwindow()
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.set_widget_zone()
+        self.set_mainwindow(100, 100, 400, 750)
         self.background_ui()
         self.stay_on_top()
-        self.setWindowFlags(QtCore.Qt.WindowStaysOnTopHint)
-    def set_mainwindow(self):
+        self.setWindowFlags(Qt.WindowStaysOnTopHint)
+    def set_mainwindow(self, x, y, dx, dy):
         self.setWindowTitle("AquaWidget")
-        self.setGeometry(100, 100, 400, 750)
+        self.move(x, y)
+        self.setFixedSize(dx, dy)
     def background_ui(self):
         self.title = QLabel("AquaWidget", self)
         self.title.setFont(Fonts.font_harmony_title)
-        self.title.move(15, 15)
+        self.title.setGeometry(15, 15, 370, 60)
+    def set_widget_zone(self):
+        self.wz_scrollarea = QScrollArea(self)
+        self.wz_scrollarea.setGeometry(15 - 1, 60 + 15, 370 + 2, 690)
+        self.wz_scrollarea.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.wz_scrollarea.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
+        self.wz_scrollarea.setObjectName(str(uuid.uuid4()))
+        self.wz_scrollarea.setFrameStyle(QFrame.NoFrame)
+        self.widget_zone = QWidget(self.wz_scrollarea)
+        self.widget_zone.setGeometry(0, 0, 370, 0)
+        self.wz_scrollarea.setWidget(self.widget_zone)
+    def change_wz_size(self, dx, dy):
+        self.widget_zone.setGeometry(0, 0, dx, dy)
     def stay_on_top(self):
         self.sot = QCheckBox(parent=self)
         self.sot.setText('窗口置顶')
         self.sot.setChecked(True)
         def _oppo():
-            self.setWindowFlag(QtCore.Qt.WindowStaysOnTopHint, self.sot.isChecked())
+            self.setWindowFlag(Qt.WindowStaysOnTopHint, self.sot.isChecked())
             self.show()
             """
 DeepSeek Reasoner 的解决方案:
@@ -81,10 +96,9 @@ if __name__ == '__main__':
     def _acquire_qw() -> QWidget:
         return QWidget()
     
-    widgets.set_main_window(main_window)
     widgets.set_acquire_func(_acquire_qw)
     widgets.reg_all()
-    widgets.auto_lay_widgets()
+    widgets.auto_lay_widgets(main_window.widget_zone)
 
     def _ra(): main_window.stay_on_top(); main_window.show()
     def _qu(): app.quit()

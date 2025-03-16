@@ -21,7 +21,7 @@ weather -- request from server
 def reg() -> AquaWidget:
     global acquire_func
     aquaw = AquaWidget(scale = (370, 370))
-    degree = 
+    degree = 15
     show_degree = QLabel('{degree}°C'.format(degree = degree), parent = aquaw.get_aqua_widget())
     show_degree.move(15, 15)
     return aquaw

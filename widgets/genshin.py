@@ -17,6 +17,6 @@ def reg() -> AquaWidget:
     """
     widgets 入口函数.
     """
-    aquaw = AquaWidget(scale=(200, 200))
+    aquaw = AquaWidget(scale=(370, 120))
     text1 = QLabel('我要玩原神！', parent=aquaw.get_aqua_widget())
     return aquaw
