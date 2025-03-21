@@ -20,12 +20,12 @@ class Fonts():
         _hms_ssB_font_id = fontdb.addApplicationFont('./font/HarmonyOS_SansSC_Bold.ttf')
 
     font_harmony = QFont()
-    font_harmony.setFamily("HarmonyOS Sans SC")
+    font_harmony.setFamily("HarmonyOS Sans SC Black")
     font_harmony.setPointSize(12)
     font_harmony.setWeight(75)
 
     font_harmony_title = QFont()
-    font_harmony_title.setFamily("HarmonyOS Sans SC")
+    font_harmony_title.setFamily("HarmonyOS Sans SC Black")
     font_harmony_title.setPointSize(30)
     font_harmony_title.setWeight(200)
 
