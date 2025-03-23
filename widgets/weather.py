@@ -2,7 +2,9 @@ import json
 import requests
 
 from widgets import AquaWidget
+from gui import Fonts
 from PyQt5.QtWidgets import *
+from PyQt5.QtGui import Qpixmap
 
 acquire_func = None
 def set_acquire_func(func) -> None:
@@ -24,6 +26,14 @@ def reg() -> AquaWidget:
     aquaw = AquaWidget(scale = (370, 370))
     show_degree = QLabel(parent = aquaw.get_aqua_widget())
     weather = get_weather_by_local_ip()['data']
-    show_degree.setText(f"{weather['cityId']} {weather['temperature']}℃")
+    show_degree.setText(f"{weather['temperature']}℃")
+    show_degree.setFont(Fonts.font_harmony_title)
+    show_degree.setStyleSheet("color:rgba(255, 255, 255, 0.7);")
     show_degree.move(15, 15)
+
+    show_city = QLabel(parent = aquaw.get_aqua_widget())
+    show_city.setText(weather['cityId'])
+    show_city.setFont(Fonts.font_harmony)
+    show_city.setStyleSheet("color:rgba(255, 255, 255, 0.7);")
+    show_city.move(15, 45)
     return aquaw
