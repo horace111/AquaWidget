@@ -3,7 +3,7 @@ import threading
 
 from plugins import music_player_plugin
 from widgets import AquaWidget
-from PyQt5.QtWidgets import *
+from stdqt import *
 
 acquire_func = None
 
@@ -40,11 +40,6 @@ def reg() -> AquaWidget:
     fp = './resources/大喜.flac'
     def _quick_play() -> None:
         player = music_player_plugin.quick_play(fp, parent=aquaw.get_aqua_widget())
-    def _thread():
-        music_player_plugin.pyglet.app.run()
-    t = threading.Thread(target=_thread)
-    t.daemon = True
-    t.start()
     
     # 一个播放按钮
     button1 = QPushButton('Play', parent=aquaw.get_aqua_widget())

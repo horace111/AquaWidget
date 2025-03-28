@@ -1,13 +1,10 @@
 import sys
 import uuid
+
 import widgets
+from account import MainWindowHeader
 
-from PyQt5 import QtGui
-from PyQt5.QtWidgets import *
-from PyQt5.QtCore import QPropertyAnimation, Qt
-from PyQt5.QtGui import *
-
-import widgets.music_player
+from stdqt import *
 
 
 class Fonts():
@@ -33,6 +30,7 @@ class Main(QWidget):
         self.background_ui()
         self.stay_on_top()
         self.setWindowFlags(Qt.WindowStaysOnTopHint)
+        self.setup_header()
     def set_mainwindow(self, x, y, dx, dy):
         self.setWindowTitle("AquaWidget")
         self.move(x, y)
@@ -96,7 +94,9 @@ if sys.platform == "win32":
         self.tray.setContextMenu(self.traymenu)
         self.tray.activated.connect(self._activate_by_tray)
         self.tray.show()
-        return
+    def setup_header(self) -> None:
+        self.header = MainWindowHeader(self)
+        self.header.setGeometry(400 - 15 - 60, 15, 60, 60)
     def _activate_by_tray(self) -> None:
         self.show()
     def closeEvent(self, a0) -> None:  # self.close() 以任何形式被调用时, 都只隐藏而不退出

@@ -1,7 +1,7 @@
 import sys
 
 from widgets import AquaWidget
-from PyQt5.QtWidgets import *
+from stdqt import *
 
 acquire_func = None
 
