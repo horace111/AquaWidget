@@ -37,6 +37,7 @@ class Main(QWidget):
         self.setWindowTitle("AquaWidget")
         self.move(x, y)
         self.setFixedSize(dx, dy)
+        self.setStyleSheet("background-color: #e6e6e6;")
     def background_ui(self):
         self.title = QLabel("AquaWidget", self)
         self.title.setFont(Fonts.font_harmony_title)
