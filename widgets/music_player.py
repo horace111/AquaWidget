@@ -39,7 +39,7 @@ def reg() -> AquaWidget:
 
     fp = './resources/大喜.flac'
     def _quick_play() -> None:
-        player = music_player_plugin.quick_play(fp)
+        player = music_player_plugin.quick_play(fp, parent=aquaw.get_aqua_widget())
     def _thread():
         music_player_plugin.pyglet.app.run()
     t = threading.Thread(target=_thread)

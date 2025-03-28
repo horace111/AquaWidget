@@ -88,9 +88,10 @@ if sys.platform == "win32":
         self.traymenu = QMenu('AquaWidget', parent=self)
         _ac = QAction('退出', parent=self)
         _ac.triggered.connect(self.app.quit)
+        self.traymenu.addAction(_ac)
 
         self.tray = QSystemTrayIcon(self)
-        self.tray.setIcon = QIcon("./resources/python-logo-only.png")
+        self.tray.setIcon(QIcon("./resources/python-logo-only.ico"))
         self.tray.setToolTip('AquaWidget')
         self.tray.setContextMenu(self.traymenu)
         self.tray.activated.connect(self._activate_by_tray)
@@ -105,6 +106,7 @@ if sys.platform == "win32":
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     Fonts.initialize()
+    app.setStyle(QStyleFactory.create('GTK'))
 
     main_window = Main()
 
