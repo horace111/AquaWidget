@@ -1,13 +1,11 @@
 import sys
 import uuid
-
-import tray
 import widgets
 
-from PyQt5 import QtGui, QtCore
+from PyQt5 import QtGui
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import QPropertyAnimation, Qt
-from PyQt5.QtGui import QFont
+from PyQt5.QtGui import *
 
 import widgets.music_player
 
@@ -22,12 +20,10 @@ class Fonts():
     font_harmony = QFont()
     font_harmony.setFamily("HarmonyOS Sans SC Black")
     font_harmony.setPointSize(12)
-    font_harmony.setWeight(75)
 
     font_harmony_title = QFont()
     font_harmony_title.setFamily("HarmonyOS Sans SC Black")
     font_harmony_title.setPointSize(30)
-    font_harmony_title.setWeight(200)
 
 class Main(QWidget):
     def __init__(self, *args, **kwargs):
@@ -83,6 +79,24 @@ if sys.platform == "win32":
                 win32con.SWP_NOMOVE | win32
             """
         self.sot.stateChanged.connect(_oppo)
+    def _bind_tray_action(self):
+        return
+    def setApp(self, app:QApplication) -> None:
+        self.app = app
+    def set_sys_tray(self) -> None:
+        self.traymenu = QMenu('AquaWidget', parent=self)
+        _ac = QAction('退出', parent=self)
+        _ac.triggered.connect(self.app.quit)
+
+        self.tray = QSystemTrayIcon(self)
+        self.tray.setIcon = QIcon("./resources/python-logo-only.png")
+        self.tray.setToolTip('AquaWidget')
+        self.tray.setContextMenu(self.traymenu)
+        self.tray.activated.connect(self._activate_by_tray)
+        self.tray.show()
+        return
+    def _activate_by_tray(self) -> None:
+        self.show()
     def closeEvent(self, a0) -> None:  # self.close() 以任何形式被调用时, 都只隐藏而不退出
         self.hide()
         a0.ignore()
@@ -102,15 +116,10 @@ if __name__ == '__main__':
 
     def _ra(): main_window.stay_on_top(); main_window.show()
     def _qu(): app.quit()
-    mo = tray.bind_menu_option(
-        {
-            '主程序': _ra,
-            '音乐示例': lambda:widgets.music_player.music_player_plugin.quick_play('D:\\python_works\\obs\\大喜.flac'),
-            '退出': _qu
-        }
-    )
-    tray.apply(mo)
-    
+
+    main_window.setApp(app)
+    main_window.set_sys_tray()
+
     main_window.show()
 
     sys.exit(app.exec_())
