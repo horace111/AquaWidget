@@ -23,27 +23,15 @@ def reg() -> AquaWidget:
     widgets 入口函数.
     """
     aquaw = AquaWidget(scale=(370, 120))
-
-
-    '''
-    app = QApplication(sys.argv)
-
-    sub_window = QWidget()
-    sub_window.setFixedSize(400, 400)
     
-    def _sub_window_exec() -> None:
-        sub_window.show()
-        t = threading.Thread(target=app.exec)
-        t.start()
-    '''
+    def _awsetup():
+        button1 = QPushButton('Play/Pause', parent=aquaw.get_aqua_widget())
+        button1.setGeometry(30, 30, 140, 50)
+        button1.clicked.connect(lambda a0: music_player_plugin.win_med_quick_playing_status_switch())
+        qw = aquaw.get_aqua_widget()
+        qw.setObjectName('music_player_widget')
+        qw.setStyleSheet('QWidget#muusic_player_widget{border-image:url()}')
 
-    fp = './resources/大喜.flac'
-    def _quick_play() -> None:
-        player = music_player_plugin.quick_play(fp, parent=aquaw.get_aqua_widget())
-    
-    # 一个播放按钮
-    button1 = QPushButton('Play', parent=aquaw.get_aqua_widget())
-    button1.setGeometry(30, 30, 140, 50)
-    button1.clicked.connect(_quick_play)
-
+    t = threading.Thread(target=_awsetup)
+    t.start()
     return aquaw

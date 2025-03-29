@@ -174,4 +174,7 @@ cython_debug/
 .pypirc
 
 # PyCharm
-.idea
+.idea/
+
+AquaWidget-CPP.
+Qt*.dll
