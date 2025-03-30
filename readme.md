@@ -27,7 +27,7 @@ AI is deeply integrated into AquaWidget. The first two usages are *Today* and *D
 
 ‼️For the server side, which is mainly written by MnlSmile, please refer to [AquaWidget-Server](https://github.com/MnlSmile/AquaWidget-Server).
 
-This Project is made by [MnlSmile](https://github.com/MnlSmile) and [horace111](https://github.com/horace111). ⚠️And the latter is new to such projects(with PyQt5), so if there's any problems, please create an issue to let us know, and don't learn from it.
+This Project is made by [MnlSmile](https://github.com/MnlSmile) and [horace111](https://github.com/horace111). ⚠️And the latter is new to such projects(with PyQt5), so if there's any problems, please create an issue to let us know, and don't learn from it. (Added MnlSmile: Look at my Result Oriented Programming then.)
 
 ⬇️**Installation**
 
