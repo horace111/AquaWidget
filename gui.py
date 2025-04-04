@@ -2,7 +2,9 @@ import sys
 import uuid
 
 import widgets
-from account import MainWindowHeader
+import auth.avatar
+from auth import MainWindowHeader
+from winenvvars import TEMP, APPDATA
 
 from stdqt import *
 
@@ -78,8 +80,6 @@ if sys.platform == "win32":
                 win32con.SWP_NOMOVE | win32
             """
         self.sot.stateChanged.connect(_oppo)
-    def _bind_tray_action(self):
-        return
     def setApp(self, app:QApplication) -> None:
         self.app = app
     def set_sys_tray(self) -> None:
@@ -97,6 +97,7 @@ if sys.platform == "win32":
     def setup_header(self) -> None:
         self.header = MainWindowHeader(self)
         self.header.setGeometry(400 - 15 - 60, 15, 60, 60)
+        self.header.setHeaderImageUrl(auth.avatar.query('kedoukedou33@163.com'))
     def _activate_by_tray(self) -> None:
         self.show()
     def closeEvent(self, a0) -> None:  # self.close() 以任何形式被调用时, 都只隐藏而不退出
@@ -106,19 +107,16 @@ if sys.platform == "win32":
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     Fonts.initialize()
-    app.setStyle(QStyleFactory.create('GTK'))
 
     main_window = Main()
 
     def _acquire_qw() -> QWidget:
         return QWidget()
     
-    widgets.set_acquire_func(_acquire_qw)
+    widgets.set_qwidget_source(_acquire_qw)
+    widgets.set_main_window_widget_zone(main_window.widget_zone)
     widgets.reg_all()
-    widgets.auto_lay_widgets(main_window.widget_zone)
-
-    def _ra(): main_window.stay_on_top(); main_window.show()
-    def _qu(): app.quit()
+    widgets.auto_lay_widgets()
 
     main_window.setApp(app)
     main_window.set_sys_tray()
