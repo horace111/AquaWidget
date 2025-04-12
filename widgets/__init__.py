@@ -1,7 +1,7 @@
 """
 """
 
-import asyncio
+import traceback
 import os
 import importlib
 import uuid
@@ -101,7 +101,9 @@ def reg_all() -> None:
             p.set_qwidget_source(_ac_func)
             aqua_widgets.append(p.reg())
         except Exception:
-            pass
+            print(f"组件 {p.__name__} 注册失败, 因为:")
+            traceback.print_exc()
+            print('\n')
 
 def auto_lay_widgets() -> None:
     # 暂时无脑竖着排列
