@@ -33,11 +33,12 @@ class Main(QWidget):
         self.stay_on_top()
         self.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.setup_header()
+        self.setWindowIcon(QIcon("./resources/forMain/icon/aquawidget_round_square_icon.svg"))
     def set_mainwindow(self, x, y, dx, dy):
         self.setWindowTitle("AquaWidget")
         self.move(x, y)
         self.setFixedSize(dx, dy)
-        self.setStyleSheet("background-color: #e6e6e6;")
+        self.setStyleSheet("background-color: #E6E6E6;")
     def background_ui(self):
         self.title = QLabel("AquaWidget", self)
         self.title.setFont(Fonts.font_harmony_title)
