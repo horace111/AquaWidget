@@ -1,4 +1,4 @@
-! [aquawidget_blue_headpicture](./resources/forMain/head_picture/aquawidget_blue_headpic.svg)
+![aquawidget_blue_headpicture](./resources/forMain/head_picture/aquawidget_blue_headpic.svg)
 # **AquaWidget**
 ------------
 ### A personal assistant right by your side.
