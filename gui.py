@@ -89,7 +89,7 @@ if sys.platform == "win32":
         self.traymenu.addAction(_ac)
 
         self.tray = QSystemTrayIcon(self)
-        self.tray.setIcon(QIcon("./resources/python-logo-only.ico"))
+        self.tray.setIcon(QIcon("./resources/forMain/icon/aquawidget_round_square_icon.svg"))
         self.tray.setToolTip('AquaWidget')
         self.tray.setContextMenu(self.traymenu)
         self.tray.activated.connect(self._activate_by_tray)
