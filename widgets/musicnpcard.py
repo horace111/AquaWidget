@@ -27,32 +27,61 @@ class WsServer(QWebSocketServer):
         self.newConnection.connect(self._new_connection)
     def _new_connection(self) -> None:
         client = self.nextPendingConnection()
-        self.clientConnectionChanged.emit()
+        # cws 对象在收到消息的时候发射信号
+        client.textMessageReceived.connect(this_update_tl)
         def _lost_connection():
-            self.clientConnectionChanged.emit()
             WsServer.pcp.remove(client)
             print('NP: 有一个连接断开了')
             print(f"NP: 连接数: {len(WsServer.pcp)}")
+            try:
+                self.clientConnectionChanged.emit()
+            except RuntimeError:
+                pass
         client.disconnected.connect(_lost_connection)
         WsServer.pcp.append(client)
         print('NP: 收到新连接')
         print(f"NP: 连接数: {len(WsServer.pcp)}")
         client.sendTextMessage("MusicNPCard Accepted Your Connection.")
+        self.clientConnectionChanged.emit()
         
 
-def quick_send(msg:str) -> None:
+def quick_asyncio_start(func):
+    def _wrap(*args, **kwargs):
+        asyncio.run(func(*args, **kwargs))
+    return _wrap
+
+@quick_asyncio_start
+async def quick_send(msg:str) -> None:
     for c in WsServer.pcp:
-        #if c.state():
+        if c.state():
             c.sendTextMessage(msg)
 
-def pause_play_music() -> None:
-    quick_send('play/pause')
+def ncm_pause_play_music() -> None:
+    quick_send('servercmd:play/pause')
+
+def this_update_tl(msg:str) -> None:
+    global lyric_label
+    #print(msg)
+    il = msg.split(';;')
+    print(il)
+    rdata = il[1]
+    _l = len(il)
+    if _l == 4:
+        lyric = il[2][6:]
+        second_lyric = il[3][9:]
+        lyric_label.setText(f"{lyric}\n{second_lyric}")
+    elif _l == 3:
+        lyric = il[2][6:]
+        lyric_label.setText(lyric)
+    else:
+        pass
 
 def qwsserver(qws:QWebSocketServer):
     qws.listen(QHostAddress("127.0.0.1"), 6377)
-        
+
 def reg() -> AquaWidget:
-    global acquire_func
+    # lyric 变量全局唯一, 认为全局变量合理
+    global acquire_func, lyric_label
     """
     widgets 入口函数.
     """
@@ -72,9 +101,14 @@ def reg() -> AquaWidget:
     button1 = QPushButton('Play/Pause NP')
     aquaw.bind_child_widget_with_aqua_widget_qwidget(button1)
     button1.setGeometry(30, 30, 140, 50)
-    button1.clicked.connect(pause_play_music)
+    button1.clicked.connect(ncm_pause_play_music)
 
-    qwsserver(qws)
+    lyric_label = QLabel()
+    lyric_label.setGeometry(370 - 30 - 140, 30, 140, 50)
+    aquaw.bind_child_widget_with_aqua_widget_qwidget(lyric_label)
+
+    #qwsserver(qws)
+    qws.listen(QHostAddress("127.0.0.1"), 6377)
 
     return aquaw
 
