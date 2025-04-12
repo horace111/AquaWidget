@@ -5,7 +5,7 @@ from stdqt import *
 
 acquire_func = None
 
-def set_acquire_func(func) -> None:
+def set_qwidget_source(func) -> None:
     global acquire_func
     """
     该函数在 widgets/__init__.py 中自动调用. 通过调用 acquire_func(), 可以从主程序获取一个 QWidget() 对象.
@@ -18,5 +18,7 @@ def reg() -> AquaWidget:
     widgets 入口函数.
     """
     aquaw = AquaWidget(scale=(370, 120))
-    text1 = QLabel('我要玩原神！', parent=aquaw.get_aqua_widget())
+    text1 = QLabel('我要玩原神！')
+    aquaw.bind_child_widget_with_aqua_widget_qwidget(text1)
+
     return aquaw

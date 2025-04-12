@@ -7,7 +7,7 @@ from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QPixmap
 
 acquire_func = None
-def set_acquire_func(func) -> None:
+def set_qwidget_source(func) -> None:
     global acquire_func
     acquire_func = func
 
@@ -24,7 +24,7 @@ def get_weather_by_local_ip():
 def reg() -> AquaWidget:
     global acquire_func
     aquaw = AquaWidget(scale = (370, 370))
-    show_degree = QLabel(parent = aquaw.get_aqua_widget())
+    show_degree = QLabel()
     weather = get_weather_by_local_ip()['data']
     show_degree.setText(f"{weather['temperature']}℃")
     show_degree.setFont(Fonts.font_harmony_title)
@@ -32,10 +32,13 @@ def reg() -> AquaWidget:
     show_degree.setStyleSheet("QLabel#weather_show_degree{color:rgba(255, 255, 255, 0.7)}")
     show_degree.move(15, 15)
 
-    show_city = QLabel(parent = aquaw.get_aqua_widget())
+    show_city = QLabel()
     show_city.setText(weather['cityId'])
     show_city.setFont(Fonts.font_harmony)
     show_degree.setObjectName('weather_show_city')
     show_degree.setStyleSheet("QLabel#weather_show_city{color:rgba(255, 255, 255, 0.7)}")
     show_city.move(15, 45)
+
+    aquaw.bind_child_widget_with_aqua_widget_qwidget(show_degree)
+    aquaw.bind_child_widget_with_aqua_widget_qwidget(show_city)
     return aquaw
