@@ -8,7 +8,6 @@ from winenvvars import TEMP, APPDATA
 
 from stdqt import *
 
-
 class Fonts():
     @staticmethod
     def initialize():
@@ -98,7 +97,7 @@ if sys.platform == "win32":
     def setup_header(self) -> None:
         self.header = MainWindowHeader(self)
         self.header.setGeometry(400 - 15 - 60, 15, 60, 60)
-        self.header.setHeaderImageUrl(auth.avatar.query('kedoukedou33@163.com'))
+        #self.header.setHeaderImageUrl(auth.avatar.query('kedoukedou33@163.com'))
     def _activate_by_tray(self, reason:QSystemTrayIcon.ActivationReason) -> None:
         if reason == 2:  # 只响应双击
             self.show()

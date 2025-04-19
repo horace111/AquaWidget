@@ -180,3 +180,5 @@ AquaWidget-CPP.
 Qt*.dll
 
 .vscode/
+
+auth/temp

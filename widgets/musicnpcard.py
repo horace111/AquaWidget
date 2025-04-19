@@ -63,7 +63,6 @@ def this_update_tl(msg:str) -> None:
     global lyric_label
     #print(msg)
     il = msg.split(';;')
-    print(il)
     rdata = il[1]
     _l = len(il)
     if _l == 4:

@@ -1,23 +1,45 @@
+import os
+import threading
+
+import auth.avatar
+import auth.login
+
 from stdqt import *
 
+CLIENT_SECRET = ''
+
+def user_login_flow() -> str:
+    return auth.login.user_login_flow()
+
 class MainWindowHeader(QPushButton):
+    static_unique_main_window_header_instance = None  # 这类的实例全局且唯一
+    client_secret = ''
+
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
-        self.headerImage = ''
+        self.clicked.connect(auth.login.user_login_flow)
+        self.headerImage = ''  # 和 Qt 命名格式一样
         self.setObjectName('MainWindowHeader')
         self.setMouseTracking(True)  # 否则 Qt 为了节省资源, 会仅在鼠标按下的时候跟踪
-        self.hide()  # 在 .headerImage 属性有值前, 都不显示出来
-    def setHeaderImageUrl(self, url:str) -> None:
-        self.headerImage = url
-        if not self.isVisible():
-            self.setStyleSheet(
-                f"""QPushButton#MainWindowHeader {'{'}
+        self.setStyleSheet(
+            f"""QPushButton#MainWindowHeader {'{'}
                 border-image: url({self.headerImage});
                 border: 1px solid black;
                 border-radius: 30px
                 {'}'}"""
-            )
-            self.show()
+        )  # 在 self.headerImage 有值前, 显示默认样式
+        MainWindowHeader.static_unique_main_window_header_instance = self
+        self._thread_onstart_auto_login()
+    def setHeaderImageUrl(self, url:str) -> None:
+        self.headerImage = url
+        self.setStyleSheet(
+            f"""QPushButton#MainWindowHeader {'{'}
+            border-image: url({self.headerImage});
+            border: 1px solid black;
+            border-radius: 30px
+            {'}'}"""
+        )
+        self.show()
     # 重写 mouseMoveEvent
     def mouseMoveEvent(self, e):
         if ((e.pos().x() - 30) ** 2 + (e.pos().y() - 30) ** 2) ** 0.5 <= 30:  # 注意减 30 是因为相对坐标
@@ -64,3 +86,14 @@ class MainWindowHeader(QPushButton):
             {'}'}"""
         )
         return super().mouseReleaseEvent(e)
+    def onstart_auto_login(self):
+        if os.path.exists('./auth/temp/cached'):
+            with open('./auth/temp/cached', 'r', encoding='utf-8') as f:
+                account, dsign, sign = f.read().split('\n')
+            _cs = auth.login.login_via_signatures(account, dsign, sign)
+            if _cs:
+                CLIENT_SECRET = _cs
+                MainWindowHeader.client_secret = _cs
+                self.setHeaderImageUrl(auth.avatar.query(account))
+    def _thread_onstart_auto_login(self):
+        threading.Thread(target=self.onstart_auto_login).start()

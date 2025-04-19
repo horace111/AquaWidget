@@ -6,7 +6,7 @@ def query(em:str) -> str:
     """
     Return value is the avatar path.
     """
-    r = requests.get('http://47.119.20.145:82/api/v1/auth/avatar', params={"account": em})
+    r = requests.get('http://47.119.20.145:8000/api/v1/auth/avatar', params={"account": em})
     try:
         with open(f"{TEMP}/AquaWidget/user_avatar.png", 'wb') as f:
             f.write(r.content)
