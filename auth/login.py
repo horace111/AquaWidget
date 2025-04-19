@@ -12,7 +12,7 @@ CLIENT_SECRET = ''
 def quickmap(**kwargs) -> dict:
     return kwargs
 
-def login(account:str, password:str) -> str | None:
+def login(account:str, password:str) -> str:
     data = quickmap(
         clientToken = str(uuid.uuid4()),
         account = account,
@@ -31,7 +31,7 @@ def login(account:str, password:str) -> str | None:
     else:
         return None
     
-def login_via_signatures(account:str, _signature:str, _deviced_signature:str) -> str | None:
+def login_via_signatures(account:str, _signature:str, _deviced_signature:str) -> str:
     data = quickmap(
         clientToken = str(uuid.uuid4()),
         account = account,
