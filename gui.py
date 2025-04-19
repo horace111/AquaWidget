@@ -99,8 +99,9 @@ if sys.platform == "win32":
         self.header = MainWindowHeader(self)
         self.header.setGeometry(400 - 15 - 60, 15, 60, 60)
         self.header.setHeaderImageUrl(auth.avatar.query('kedoukedou33@163.com'))
-    def _activate_by_tray(self) -> None:
-        self.show()
+    def _activate_by_tray(self, reason:QSystemTrayIcon.ActivationReason) -> None:
+        if reason == 2:  # 只响应双击
+            self.show()
     def closeEvent(self, a0) -> None:  # self.close() 以任何形式被调用时, 都只隐藏而不退出
         self.hide()
         a0.ignore()

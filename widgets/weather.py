@@ -52,27 +52,24 @@ def reg() -> AquaWidget:
             aquaw.setStyleSheet("background-image: url(./resources/forWeather/background/fog.jpg);")
         else:
             return None
-    def show_text() -> None:
-        show_degree = QLabel()
-        show_degree.setText(f"{weather}°C")
-        show_degree.setFont(Fonts.font_harmony_title)
-        show_degree.setStyleSheet("color: white")
-        show_degree.move(15, 20)
 
-        show_city = QLabel()
-        show_city.setText(city)
-        show_city.setFont(Fonts.font_harmony)
-        show_city.setStyleSheet("color: white")
-        show_city.move(20, 90)
+    show_degree = QLabel()
+    show_degree.setText(f"{weather}°C")
+    show_degree.setFont(Fonts.font_harmony_title)
+    show_degree.setStyleSheet("color: white")
+    show_degree.move(15, 20)
 
-    def show_bar():
-        pass
+    show_city = QLabel()
+    show_city.setText(city)
+    show_city.setFont(Fonts.font_harmony)
+    show_city.setStyleSheet("color: white")
+    show_city.move(20, 90)
+
     '''
     在这里接续一下工作：
     1. set_blur是设置高斯模糊，需要将./resources/forMain/bar.png放置在卡片x = 0，y = 280处，然后应用模糊填充
     2. 天气图标./resources/forWeather/icon是展示未来三小时天气的，暂时不做
     3. 帮我改一下这堆史山
     '''
-    aquaw.bind_child_widget_with_aqua_widget_qwidget(show_text(show_degree))
-    aquaw.bind_child_widget_with_aqua_widget_qwidget(show_city)
+    aquaw.bind_child_widget_with_aqua_widget_qwidget(show_degree)
     return aquaw

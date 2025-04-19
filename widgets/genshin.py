@@ -1,4 +1,5 @@
-import sys
+import os
+import threading
 
 from widgets import AquaWidget
 from stdqt import *
@@ -19,6 +20,16 @@ def reg() -> AquaWidget:
     """
     aquaw = AquaWidget(scale=(370, 120))
     text1 = QLabel('我要玩原神！')
+    
+    button1 = QPushButton()
+    button1.setText('玩原神')
+    genshin = QProcess()
+    aquaw.bind_child_widget_with_aqua_widget_qwidget(genshin)
+    def _play():
+        threading.Thread(target=os.system, args=(f"\"{os.getenv('GENSHIN')}\"",)).start()
+    button1.clicked.connect(_play)
+
+    aquaw.bind_child_widget_with_aqua_widget_qwidget(button1)
     aquaw.bind_child_widget_with_aqua_widget_qwidget(text1)
 
     return aquaw
