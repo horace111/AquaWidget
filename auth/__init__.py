@@ -1,4 +1,5 @@
 import os
+import traceback
 import threading
 
 import auth.avatar
@@ -7,6 +8,18 @@ import auth.login
 from stdqt import *
 
 CLIENT_SECRET = ''
+client_secret_callback = None
+
+def set_client_secret_callback(func) -> None:
+    global client_secret_callback
+    client_secret_callback = func
+
+def quick_css_statement(selector:str, statements:dict) -> str:
+    result = ''
+    result += selector + ' {\n'
+    for k,v in statements.items():
+        result += f"    {k}: {v};\n"
+    return result + '}'
 
 def user_login_flow() -> str:
     return auth.login.user_login_flow()
@@ -32,42 +45,23 @@ class MainWindowHeader(QPushButton):
         self._thread_onstart_auto_login()
     def setHeaderImageUrl(self, url:str) -> None:
         self.headerImage = url
-        self.setStyleSheet(
-            f"""QPushButton#MainWindowHeader {'{'}
-            border-image: url({self.headerImage});
-            border: 1px solid black;
-            border-radius: 30px
-            {'}'}"""
-        )
+        _s1 = quick_css_statement(
+            'QPushButton#MainWindowHeader', {
+                    'border-image': f'url({self.headerImage})',
+                    'border': '1px solid black',
+                    'border-radius': '30px'
+                }
+            )
+        _s2 = quick_css_statement(
+            'QPushButton#MainWindowHeader:hover', {
+                    'border-image': f'url({self.headerImage})',
+                    'border': '1px solid black',
+                    'border-radius': '30px',
+                }
+            )
+        self.default_css = f"{_s1}\n{_s2}"
+        self.setStyleSheet(self.default_css)
         self.show()
-    # 重写 mouseMoveEvent
-    def mouseMoveEvent(self, e):
-        if ((e.pos().x() - 30) ** 2 + (e.pos().y() - 30) ** 2) ** 0.5 <= 30:  # 注意减 30 是因为相对坐标
-            self.setStyleSheet(
-                """QPushButton#MainWindowHeader {
-                background-color: green;
-                border: 1px solid black;
-                border-radius: 30px
-                }"""
-            )
-        else:
-            self.setStyleSheet(
-                """QPushButton#MainWindowHeader {
-                background-color: black;
-                border: 1px solid black;
-                border-radius: 30px
-                }"""
-            )
-        return super().mouseMoveEvent(e)
-    
-    # 暂时不启用鼠标悬浮交互
-    def mouseMoveEvent(self, e):
-        return super().mouseMoveEvent(e)  
-    
-    # 重写 mousePressEvent
-    # 或者通过一个半透明颜色直接覆盖在上面  .show()  .hide()  可能性能更佳
-    # 4.4 补注: 现在认为上一行注释所述确为更佳实践. 我不想让 requests.get() 卡住主线程, 而在下完
-    #           头像之后新线程应用下好的头像, 会干扰这些交互逻辑
     def mousePressEvent(self, e):
         self.setStyleSheet(
             """QPushButton#MainWindowHeader {
@@ -79,21 +73,23 @@ class MainWindowHeader(QPushButton):
         return super().mousePressEvent(e)
     def mouseReleaseEvent(self, e):
         self.setStyleSheet(
-            f"""QPushButton#MainWindowHeader {'{'}
-            border-image: url({self.headerImage});
-            border: 1px solid black;
-            border-radius: 30px
-            {'}'}"""
+            self.default_css
         )
         return super().mouseReleaseEvent(e)
     def onstart_auto_login(self):
-        if os.path.exists('./auth/temp/cached'):
-            with open('./auth/temp/cached', 'r', encoding='utf-8') as f:
-                account, dsign, sign = f.read().split('\n')
-            _cs = auth.login.login_via_signatures(account, dsign, sign)
-            if _cs:
-                CLIENT_SECRET = _cs
-                MainWindowHeader.client_secret = _cs
-                self.setHeaderImageUrl(auth.avatar.query(account))
+        try:
+            if os.path.exists('./auth/temp/cached'):
+                with open('./auth/temp/cached', 'r', encoding='utf-8') as f:
+                    account, _cs, expire_at = f.read().split('\n')
+                _cs, expire_at = auth.login.login_via_client_secret(account, _cs)
+                if _cs and _cs != 'Incorrect':
+                    CLIENT_SECRET = _cs
+                    MainWindowHeader.client_secret = _cs
+                    auth.login.cache(account, _cs, expire_at)
+                    self.setHeaderImageUrl(auth.avatar.query(account))
+        except Exception as e:
+            traceback.print_exception(e)
+            self.setHeaderImageUrl('')
+            #auth.user_login_flow()
     def _thread_onstart_auto_login(self):
-        threading.Thread(target=self.onstart_auto_login).start()
+        threading.Thread(target=self.onstart_auto_login, daemon=True).start()

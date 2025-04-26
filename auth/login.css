@@ -1,0 +1,38 @@
+#loginwindow {
+    background-color: rgb(190,215,245);
+    border-image: url('F://const_images/C2DF8CEFF8B86206215F17BFA4B38419.jpg');
+}
+
+#loginwindow QPushButton {
+    border-radius: 25px;
+    border: 1px solid rgb(141,194,234);
+    background-color: rgb(141,194,234);
+    font-family: 'JiangChengYuanTi';
+    color: white;
+    font-size: 24px;
+}
+
+#loginwindow #QPushButtonPressed {
+    border-radius: 25px;
+    border: 1px solid rgb(65,127,201);
+    background-color: rgb(65,127,201);
+    color: white;
+    font-family: 'JiangChengYuanTi';
+    font-size: 24px;
+}
+
+#loginwindow QLabel {
+    color: white;
+    font-family: 'JiangChengYuanTi';
+    font-size: 20px;
+}
+
+#loginwindow QLineEdit {
+    opacity: 30%;
+    border: 1px solid white;
+    border-radius: 5px;
+    font-family: 'TitilliumText';
+    color: black;
+    font-size: 20px;
+    /*caret-shape: underscore;*/
+}

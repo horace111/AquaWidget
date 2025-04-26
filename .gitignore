@@ -182,3 +182,5 @@ Qt*.dll
 .vscode/
 
 auth/temp
+
+widgets/genshin.py

@@ -105,6 +105,19 @@ def reg_all() -> None:
             traceback.print_exc()
             print('\n')
 
+def set_client_secret(_cs:str) -> None:
+    """
+    为所有组件设置 clientSecret.
+    组件以 widgets 包的子库或子包的形式存在.
+    """
+    for p in widget_modules:
+        try:
+            p.set_client_secret(_cs)
+        except Exception:
+            print(f"组件 {p.__name__} 注册失败, 因为:")
+            traceback.print_exc()
+            print('\n')
+
 def auto_lay_widgets() -> None:
     # 暂时无脑竖着排列
     deltaY = 15

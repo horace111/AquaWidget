@@ -11,6 +11,11 @@ set_blur.setBlurRadius(20)
 set_blur.setBlurType(QGraphicsBlurEffect.GaussianBlur)
 set_blur.setBlurHints(QGraphicsBlurEffect.QualityHint)
 
+CLIENT_SECRET = ''
+def set_client_secret(_cs:str) -> None:
+    global CLIENT_SECRET
+    CLIENT_SECRET = _cs
+
 def set_qwidget_source(func) -> None:
     global acquire_func
     acquire_func = func

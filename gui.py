@@ -1,12 +1,21 @@
 import sys
 import uuid
+import threading
+import asyncio
+import time
 
 import widgets
-import auth.avatar
-from auth import MainWindowHeader
+import auth
 from winenvvars import TEMP, APPDATA
 
 from stdqt import *
+
+CLIENT_SECRET = ''
+def set_client_secret(_cs:str) -> None:
+    global CLIENT_SECRET
+    CLIENT_SECRET = _cs
+def get_client_Secret() -> str:
+    return CLIENT_SECRET
 
 class Fonts():
     @staticmethod
@@ -26,23 +35,23 @@ class Fonts():
 class Main(QWidget):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.set_widget_zone()
-        self.set_mainwindow(100, 100, 400, 750)
-        self.background_ui()
+        self.setObjectName('MainWindow')
+        self.setup_widget_zone()
+        self.setup_mainwindow(100, 100, 400, 750)
+        self.setup_background_ui()
         self.stay_on_top()
         self.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.setup_header()
         self.setWindowIcon(QIcon("./resources/forMain/icon/aquawidget_round_square_icon.svg"))
-    def set_mainwindow(self, x, y, dx, dy):
+    def setup_mainwindow(self, x, y, dx, dy):
         self.setWindowTitle("AquaWidget")
         self.move(x, y)
         self.setFixedSize(dx, dy)
-        self.setStyleSheet("background-color: #E6E6E6;")
-    def background_ui(self):
+    def setup_background_ui(self):
         self.title = QLabel("AquaWidget", self)
         self.title.setFont(Fonts.font_harmony_title)
         self.title.setGeometry(15, 15, 370, 60)
-    def set_widget_zone(self):
+    def setup_widget_zone(self):
         self.wz_scrollarea = QScrollArea(self)
         self.wz_scrollarea.setGeometry(15 - 1, 60 + 15, 370 + 2, 690)
         self.wz_scrollarea.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
@@ -82,7 +91,7 @@ if sys.platform == "win32":
         self.sot.stateChanged.connect(_oppo)
     def setApp(self, app:QApplication) -> None:
         self.app = app
-    def set_sys_tray(self) -> None:
+    def setup_sys_tray(self) -> None:
         self.traymenu = QMenu('AquaWidget', parent=self)
         _ac = QAction('退出', parent=self)
         _ac.triggered.connect(self.app.quit)
@@ -95,9 +104,8 @@ if sys.platform == "win32":
         self.tray.activated.connect(self._activate_by_tray)
         self.tray.show()
     def setup_header(self) -> None:
-        self.header = MainWindowHeader(self)
+        self.header = auth.MainWindowHeader(self)
         self.header.setGeometry(400 - 15 - 60, 15, 60, 60)
-        #self.header.setHeaderImageUrl(auth.avatar.query('kedoukedou33@163.com'))
     def _activate_by_tray(self, reason:QSystemTrayIcon.ActivationReason) -> None:
         if reason == 2:  # 只响应双击
             self.show()
@@ -120,8 +128,11 @@ if __name__ == '__main__':
     widgets.auto_lay_widgets()
 
     main_window.setApp(app)
-    main_window.set_sys_tray()
+    main_window.setup_sys_tray()
 
     main_window.show()
+
+    auth.set_client_secret_callback(set_client_secret)
+    widgets.set_client_secret(CLIENT_SECRET)
 
     sys.exit(app.exec_())
