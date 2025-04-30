@@ -184,3 +184,5 @@ Qt*.dll
 auth/temp
 
 widgets/genshin.py
+
+gui.css

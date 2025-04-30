@@ -1,0 +1,12 @@
+QWidget #MainWindow {
+    background-color: #E6E6E6;
+}
+
+QPushButton {
+    border-radius: 25px;
+    border: 1px solid rgb(141,194,234);
+    background-color: rgb(141,194,234);
+    font-family: 'JiangChengYuanTi';
+    color: white;
+    font-size: 24px;
+}

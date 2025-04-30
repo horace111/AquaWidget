@@ -3,6 +3,7 @@ import uuid
 import threading
 import asyncio
 import time
+import traceback
 
 import widgets
 import auth
@@ -39,10 +40,18 @@ class Main(QWidget):
         self.setup_widget_zone()
         self.setup_mainwindow(100, 100, 400, 750)
         self.setup_background_ui()
+        self.setup_global_qss()
         self.stay_on_top()
         self.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.setup_header()
         self.setWindowIcon(QIcon("./resources/forMain/icon/aquawidget_round_square_icon.svg"))
+    def setup_global_qss(self) -> None:
+        try:
+            with open('./gui.css', 'r', encoding='utf-8') as f:
+                self._global_css = self._global_qss = f.read()
+                self.setStyleSheet(self._global_css)
+        except Exception as e:
+            print('主程序样式表无法载入, 因为:\n' + traceback.print_exception(e))
     def setup_mainwindow(self, x, y, dx, dy):
         self.setWindowTitle("AquaWidget")
         self.move(x, y)
