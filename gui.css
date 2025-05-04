@@ -1,3 +1,23 @@
-QWidget #MainWindow {
-    background-color: #E6E6E6;
+#MainWindow {
+    background-image: url('F://const_images/134695c41c2b6204330a8df6cabc7aee_2_1_art.png');
+}
+
+QMenu {
+    border: 1.5px solid black;
+    border-radius: 15px;
+}
+
+QMenu::item {
+    font-family: 'HarmonyOS Sans SC';
+    font-size: 16px;
+    min-height: 40px;
+    min-width: 100px;
+    margin: 1px;
+    padding-left: 19px;
+    border-radius: 15px;
+}
+
+QMenu::item:selected {
+    background-color: rgb(196, 196, 196);
+    margin: 1px;
 }

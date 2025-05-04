@@ -8,7 +8,11 @@ import uuid
 import hashlib
 import wmi
 import functools
+import threading
 
+import auth.avatar
+
+from globalvars import globalvars
 from stdqt import *
 
 CLIENT_SECRET = ''
@@ -24,6 +28,9 @@ def cache(account:str, cs:str, expire_at:int) -> None:
             f"{account}\n{cs}\n{expire_at}"
         )
 
+def decache() -> None:
+    os.remove('./auth/temp/cached')
+
 # 账密
 def login(account:str, password:str) -> tuple[str, int]:
     data = quickmap(
@@ -35,12 +42,12 @@ def login(account:str, password:str) -> tuple[str, int]:
     try:
         resp = requests.post('http://47.119.20.145:8000/api/v1/auth/login', json=data)
     except Exception:
-        return None
+        return '', 0
     rmap = resp.json()
     if rmap['retcode'] == 10000:
         return rmap['data']['clientSecret'], rmap['data']['expireAt']
     elif rmap['retcode'] >= 40000:
-        return 'Incorrect'
+        return 'Incorrect', 0
     else:
         return '', 0
 
@@ -54,32 +61,12 @@ def login_via_client_secret(account:str, cs:str) -> str:
     try:
         resp = requests.post('http://47.119.20.145:8000/api/v1/auth/login_via_client_secret', json=data)
     except Exception:
-        return None
-    rmap = resp.json()
-    if rmap['retcode'] == 10000:
-        return rmap['data']['clientSecret'], rmap['data']['expireAt']
-    elif rmap['retcode'] >= 40000:
-        return 'Incorrect'
-    else:
         return '', 0
-
-# 已有签名
-def login_via_signatures(account:str, _signature:str, _deviced_signature:str) -> str:
-    data = quickmap(
-        clientToken = str(uuid.uuid4()),
-        account = account,
-        signature = _signature,
-        devicedSignature = _deviced_signature
-    )
-    try:
-        resp = requests.post('http://47.119.20.145:8000/api/v1/auth/login', json=data)
-    except Exception:
-        return None
     rmap = resp.json()
     if rmap['retcode'] == 10000:
         return rmap['data']['clientSecret'], rmap['data']['expireAt']
     elif rmap['retcode'] >= 40000:
-        return 'Incorrect'
+        return '', 0
     else:
         return '', 0
 
@@ -111,12 +98,14 @@ def get_device_uid() -> str:
 def signature(account:str, password:str) -> str:
     if account == 'test@mnlsmile.com':
         return 'testsign========================'
-    return md5(account + md5(neighexchange(password)))
+    print(md5(account + neighexchange(md5(password))))
+    return md5(account + neighexchange(md5(password)))
 
 def deviced_signature(account:str, password:str) -> str:
     if account == 'test@mnlsmile.com':
         return 'testdsign======================='
-    return md5(account + md5(neighexchange(password)) + md5(get_device_uid()))
+    print(md5(account + neighexchange(md5(password)) + md5(get_device_uid())))
+    return md5(account + neighexchange(md5(password)) + md5(get_device_uid()))
 
 def user_login_flow() -> None:
     global window
@@ -170,16 +159,34 @@ def user_login_flow() -> None:
     login_button.mouseReleaseEvent = functools.partial(_mouseReleaseEvent, login_button)
 
     def _login_action():
-        client_secret, expire_at = login(
-            account_input.text(),
-            password_input.text()
-        )
-        CLIENT_SECRET = client_secret
+        ac = account_input.text()
+        pw = password_input.text()
+        account_input.setEnabled(False)
+        password_input.setEnabled(False)
+        client_secret, expire_at = login(ac, pw)
         if client_secret:
-            if client_secret == 'Incorrect':
-                return
+            if not client_secret:
+                account_input.setEnabled(True)
+                password_input.setEnabled(True)
+            elif client_secret == 'Incorrect':
+                account_input.setEnabled(True)
+                password_input.setEnabled(True)
+                globalvars()['tray'].showMessage('登录失败', '账号或密码错误', msecs=5000)
             else:
-                cache(account_input.text(), client_secret, expire_at)
+                cache(ac, client_secret, expire_at)
+                globalvars()['client_secret'] = client_secret
+                
+                #def _thread_update_avatar():
+                hp = ''
+                for i in range(5):
+                    try:
+                        hp = auth.avatar.query(ac)
+                    except Exception:
+                        continue
+                    break
+                globalvars()['main_window'].header.setHeaderImageUrl(hp)
+                globalvars()['tray'].showMessage('登录成功', '欢迎', QIcon(hp), msecs=5000)
+                #threading.Thread(target=_thread_update_avatar, daemon=True).start()
                 window.close()
     login_button.clicked.connect(_login_action)
 

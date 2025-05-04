@@ -2,14 +2,25 @@ import sys
 import uuid
 import threading
 import asyncio
+import asyncqt
 import time
 import traceback
+import win32gui
+import win32con
 
+from globalvars import globalvars
+import auth.avatar
 import widgets
 import auth
+
 from winenvvars import TEMP, APPDATA
 
 from stdqt import *
+
+app = QApplication(sys.argv)
+
+el = asyncqt.QEventLoop(app)
+asyncio.set_event_loop(el)
 
 CLIENT_SECRET = ''
 def set_client_secret(_cs:str) -> None:
@@ -22,7 +33,7 @@ class Fonts():
     @staticmethod
     def initialize():
         fontdb = QtGui.QFontDatabase()
-        _hms_ss_font_id = fontdb.addApplicationFont('./font/HarmonyOS_SansSC_Black.ttf')
+        _hms_ssBB_font_id = fontdb.addApplicationFont('./font/HarmonyOS_SansSC_Black.ttf')
         _hms_ssB_font_id = fontdb.addApplicationFont('./font/HarmonyOS_SansSC_Bold.ttf')
 
     font_harmony = QFont()
@@ -39,12 +50,12 @@ class Main(QWidget):
         self.setObjectName('MainWindow')
         self.setup_widget_zone()
         self.setup_mainwindow(100, 100, 400, 750)
+        self.hwnd = None  # Initialize hwnd to None
         self.setup_background_ui()
-        self.setup_global_qss()
-        self.stay_on_top()
-        self.setWindowFlags(Qt.WindowStaysOnTopHint)
+        #self.setWindowFlags(Qt.WindowStaysOnTopHint)
         self.setup_header()
         self.setWindowIcon(QIcon("./resources/forMain/icon/aquawidget_round_square_icon.svg"))
+        self.stay_on_top()
     def setup_global_qss(self) -> None:
         try:
             with open('./gui.css', 'r', encoding='utf-8') as f:
@@ -72,44 +83,37 @@ class Main(QWidget):
         self.wz_scrollarea.setWidget(self.widget_zone)
     def change_wz_size(self, dx, dy):
         self.widget_zone.setGeometry(0, 0, dx, dy)
+    # Removed redundant stay_on_top method definition
     def stay_on_top(self):
         self.sot = QCheckBox(parent=self)
         self.sot.setText('窗口置顶')
         self.sot.setChecked(True)
-        def _oppo():
-            self.setWindowFlag(Qt.WindowStaysOnTopHint, self.sot.isChecked())
-            self.show()
-            """
-DeepSeek Reasoner 的解决方案:
-            
-            6. 替代方案：系统级置顶 API
-通过调用操作系统 API 直接修改窗口属性（无需重建窗口），但需跨平台适配：
-
-# Windows 示例(需 pywin32)
-if sys.platform == "win32":
-    import win32gui
-    import win32con
-
-    def toggle_stay_on_top_win(state):
-        hwnd = self.winId().__int__()
-        style = win32gui.GetWindowLong(hwnd, win32con.GWL_EXSTYLE)
-        if state:
-            win32gui.SetWindowPos(hwnd, win32con.HWND_TOPMOST, 0,0,0,0, 
-                win32con.SWP_NOMOVE | win32
-            """
+        def _oppo(state):
+            if self.hwnd:
+                if state == Qt.Checked:
+                    win32gui.SetWindowPos(self.hwnd, win32con.HWND_TOPMOST, 0, 0, 0, 0, win32con.SWP_NOMOVE | win32con.SWP_NOSIZE)
+                else:
+                    win32gui.SetWindowPos(self.hwnd, win32con.HWND_NOTOPMOST, 0, 0, 0, 0, win32con.SWP_NOMOVE | win32con.SWP_NOSIZE)
         self.sot.stateChanged.connect(_oppo)
+    def show(self) -> None:
+        super().show()
+        self.hwnd = win32gui.FindWindow(None, self.windowTitle())
+        win32gui.SetWindowPos(self.hwnd, win32con.HWND_TOPMOST, 0, 0, 0, 0, win32con.SWP_NOMOVE | win32con.SWP_NOSIZE)
     def setApp(self, app:QApplication) -> None:
         self.app = app
     def setup_sys_tray(self) -> None:
-        self.traymenu = QMenu('AquaWidget', parent=self)
+        self.oTraymenu = QMenu('AquaWidget', parent=self)
+        self.oTraymenu.setWindowFlag(Qt.FramelessWindowHint, True)
+        self.oTraymenu.setWindowFlag(Qt.NoDropShadowWindowHint, True)
         _ac = QAction('退出', parent=self)
         _ac.triggered.connect(self.app.quit)
-        self.traymenu.addAction(_ac)
+        self.oTraymenu.addAction(_ac)
 
         self.tray = QSystemTrayIcon(self)
+        globalvars()['tray'] = self.tray
         self.tray.setIcon(QIcon("./resources/forMain/icon/aquawidget_round_square_icon.svg"))
         self.tray.setToolTip('AquaWidget')
-        self.tray.setContextMenu(self.traymenu)
+        self.tray.setContextMenu(self.oTraymenu)
         self.tray.activated.connect(self._activate_by_tray)
         self.tray.show()
     def setup_header(self) -> None:
@@ -119,14 +123,18 @@ if sys.platform == "win32":
         if reason == 2:  # 只响应双击
             self.show()
     def closeEvent(self, a0) -> None:  # self.close() 以任何形式被调用时, 都只隐藏而不退出
-        self.hide()
-        a0.ignore()
+        a0.accept()
+        '''self.hide()
+        a0.ignore()'''  # 为了方便开发
 
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
+main_window:Main = None
+
+def main():
+    global main_window
     Fonts.initialize()
 
     main_window = Main()
+    globalvars()['main_window'] = main_window
 
     def _acquire_qw() -> QWidget:
         return QWidget()
@@ -139,9 +147,23 @@ if __name__ == '__main__':
     main_window.setApp(app)
     main_window.setup_sys_tray()
 
+    main_window.setup_global_qss()
     main_window.show()
 
     auth.set_client_secret_callback(set_client_secret)
-    widgets.set_client_secret(CLIENT_SECRET)
 
-    sys.exit(app.exec_())
+    main_window.header.setup_menu(main_window)
+
+    widgets.set_qwidget_source(_acquire_qw)
+    widgets.set_main_window_widget_zone(main_window.widget_zone)
+    widgets.reg_all()
+    widgets.auto_lay_widgets()
+
+    sys.exit(app.exec())
+    #sys.exit(el.run_forever())
+
+if __name__ == '__main__':
+    try:
+        main()
+    except KeyboardInterrupt:
+        sys.exit(-1)

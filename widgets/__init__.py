@@ -5,6 +5,8 @@ import traceback
 import os
 import importlib
 import uuid
+import asyncio
+import typing
 
 from stdqt import *
 
@@ -84,6 +86,22 @@ def load_widgets() -> list:
             print(f"AquaWidget {p} failed to load({e}).")
     return widget_pymodules
 
+async def a_load_widgets() -> list:
+    """
+    async
+    加载所有组件.
+    组件以 widgets 包的子库或子包的形式存在.
+    """
+    pl = scan()
+    widget_pymodules = []
+    for p in pl:
+        try:
+            _module = importlib.import_module(p)
+            widget_pymodules.append(_module)
+        except Exception as e:
+            print(f"AquaWidget {p} failed to load({e}).")
+    return widget_pymodules
+
 widget_modules = load_widgets()
 aqua_widgets:list[AquaWidget] = []
 
@@ -100,6 +118,24 @@ def reg_all() -> None:
         try:
             p.set_qwidget_source(_ac_func)
             aqua_widgets.append(p.reg())
+        except Exception:
+            print(f"组件 {p.__name__} 注册失败, 因为:")
+            traceback.print_exc()
+            print('\n')
+
+async def a_reg_all() -> None:
+    """
+    async
+    注册所有组件.
+    组件以 widgets 包的子库或子包的形式存在.
+    """
+    for p in widget_modules:
+        try:
+            p.set_qwidget_source(_ac_func)
+            _r = p.reg()
+            if type(_r) == typing.Coroutine:
+                pass
+            aqua_widgets.append(_r)
         except Exception:
             print(f"组件 {p.__name__} 注册失败, 因为:")
             traceback.print_exc()
